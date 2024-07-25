@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  become: true
+  #gather_facts: no
+  tasks:
+
+  - name: Update repository index
+    apt:
+      update_cache: yes
+
+  - name: install apache package
+    apt:
+      name: apache2
+      state: latest
+
+  - name: installl php support for apache 
+    apt:
+      name: libapache2-mod-php
+      state: latest
+
+  - name: install vim editor
+    apt:
+      name: vim 
