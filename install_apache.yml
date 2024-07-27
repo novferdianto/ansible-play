@@ -5,20 +5,54 @@
   #gather_facts: no
   tasks:
 
-  - name: Update repository index
+  - name: Update repository index ubuntu
     apt:
       update_cache: yes
+    when:
+      ansible_distribution == "Ubuntu"
 
-  - name: install apache package
+  - name: install apache package ubuntu
     apt:
       name: apache2
       state: latest
+    when:
+      ansible_distribution == "Ubuntu"
 
-  - name: installl php support for apache 
+  - name: installl php support for apache  ubuntu
     apt:
       name: libapache2-mod-php
       state: latest
+    when:
+      ansible_distribution == "Ubuntu"
 
-  - name: install vim editor
+  - name: install vim editor ubuntu
     apt:
-      name: vim 
+      name: vim
+    when:
+      ansible_distribution == "Ubuntu"
+
+  - name: Update repository index centos
+    dnf:
+      update_cache: yes
+    when:
+      ansible_distribution == "CentOS"
+
+  - name: install apache package centos
+    dnf:
+      name: httpd
+      state: latest
+    when:
+      ansible_distribution == "CentOS"
+
+  - name: installl php support for apache centos
+    dnf:
+      name: php
+      state: latest
+    when:
+      ansible_distribution == "CentOS"
+
+  - name: install vim editor centos
+    dnf:
+      name: vim
+    when:
+      ansible_distribution == "CentOS"
