@@ -1,0 +1,65 @@
+---
+
+- hosts: all
+  become: true 
+
+  pre_tasks:
+
+  - name: Install update CentOS
+    tags: always, centos
+    ansible.builtin.dnf:
+      #update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: Install update Ubuntu
+    tags: always, ubuntu
+    ansible.builtin.apt:
+      #upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  become: true
+
+  tasks:
+  - name: Install apache2,php latest and update repo on Ubuntu
+    tags: apache, apache2, web_servers, ubuntu
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Install apache, php latest and update repo on CentOS
+    tags: apache, httpd, web_servers, centos
+    dnf:
+      name:
+        - httpd
+        - php
+      state: latest
+    when: ansible_distribution == "CentOS"
+
+- hosts: db_servers
+  become: true
+
+  tasks:
+
+  - name: Install mysql mariadb on db_servers
+    tags: db, mariadb, ubuntu
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: file_servers
+  become: true
+
+  tasks:
+  
+  - name : Install samba file_servers
+    tags: samba, ubuntu
+    ansible.builtin.package:
+      name: samba
+      state: latest
