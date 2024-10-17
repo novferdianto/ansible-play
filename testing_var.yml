@@ -1,0 +1,24 @@
+---
+- hosts: localhost
+  become: false
+  gather_facts: false
+
+  tasks:
+
+  - name: Echo example 1
+    shell:
+      cmd: "echo 12:34:56:78:90:AB:CD:EF"
+    register: VAR
+
+  - name: Echo example 2
+    shell:
+      cmd: "echo {{ VAR.stdout_lines }}"
+    register: result
+
+  - name: Show registered variable
+    debug:
+      var: result.stdout
+
+  - name: Show result content only
+    debug:
+      msg: "{{ result }}"

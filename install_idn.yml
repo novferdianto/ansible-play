@@ -1,0 +1,94 @@
+---
+
+- hosts: idn
+  become: true
+  gather_facts: no
+  tasks:
+
+  - name: Update repository index ubuntu
+    apt:
+      update_cache: yes
+      upgrade: dist
+    #when:
+    # ansible_distribution == "Ubuntu"
+  
+  - name: Install mariadb
+    apt:
+      name: 
+        - mariadb-server
+        - openvswitch-switch-dpdk
+        - unzip
+        - openjdk-17-jdk
+        - openjdk-17-jre
+        - postgresql
+      state: latest
+
+  - name: create group for sonarqube
+    tags: sonar_group
+    ansible.builtin.group:
+      name: sonar
+  
+  - name: create  user for sonarqube
+    tags: sonar_user
+    ansible.builtin.user:
+      name: sonar
+      group: sonar
+      home: /opt/sonarqube
+  
+  - name: Download sonarqube
+    tags: sonarqube_download
+    ansible.builtin.unarchive:
+      src: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.1.69595.zip
+      dest: /tmp
+      remote_src: yes
+      owner: sonar
+      group: sonar
+      mode: 0755
+    #register: download_sonarqube
+    #sonarqube_token: sqp_b312b236327c3097147268f984d3467326d39d37
+
+  #- name: Link sonarqube
+  - name : Download sonarscanner
+    tags : sonarscanner_download
+    ansible.builtin.unarchive:
+      src: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+      dest: /tmp
+      remote_src: yes
+      owner: sonar
+      group: sonar
+      mode: 0755
+
+  - name : running shell
+    tags : shell_test
+    ansible.builtin.shell: ls -l
+    args:
+      chdir: /var
+    register: shell_result
+
+  - name : shell result
+    tags :  shell_test
+    ansible.builtin.debug:
+      var : shell_result.stdout_lines
+
+  - name : multiple shell command
+    tags :  sh_multiples
+#    ansible.builtin.shell: "{{ item }}"
+    ansible.builtin.shell : /usr/bin/uptime
+    args:
+      chdir: /var
+#    with_items:
+#      - mkdir halo
+#      - mkdir helo
+#      - /usr/bin/uptime
+    register: result
+
+  - name : see result sh_multiple
+    tags : sh_multiples
+    ansible.builtin.debug:
+      var :  result
+      verbosity : 2
+
+#  - name : see result sh_multiple
+#    tags : sh_multiples
+#    ansible.builtin.debug: msg="item.item={{item.item}}, item.stdout={{item.stdout}}, item.changed={{item.changed}}"
+#    with_items: "{{sh_multiple.results}}"

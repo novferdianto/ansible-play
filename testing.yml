@@ -1,0 +1,19 @@
+---
+
+- hosts : idn
+  become : true
+#  gather_facts : no
+  tasks:
+
+  - name: Get uptime information
+    ansible.builtin.shell: "{{item}}"
+    with_items:
+      - /usr/bin/uptime
+      - date
+    changed_when: false
+    register: result
+
+  - name: Print return information from the previous task
+    ansible.builtin.debug:
+      var: item
+    with_items: "{{result.results | map(attribute='stdout_lines') | list}}"

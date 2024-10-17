@@ -40,6 +40,15 @@
         - php
       state: latest
     when: ansible_distribution == "CentOS"
+  
+  - name: copy index2.html to web_servers
+    tags: apache, apache2, httpd
+    ansible.builtin.copy:
+      src: index2.html
+      dest: /var/www/html/
+      owner: root
+      group: root
+      mode: 0644
 
 - hosts: db_servers
   become: true
@@ -63,3 +72,44 @@
     ansible.builtin.package:
       name: samba
       state: latest
+  
+  - name: install unzip
+    tags: unzip
+    ansible.builtin.package:
+      name: unzip
+      state: latest
+
+  - name: Create tmp directory
+    tags: osboxes_directory
+    ansible.builtin.file:
+      path: /home/osboxes/tmp_download
+      state: directory
+      owner: osboxes
+      group: osboxes
+      mode: 0644
+    register: create_tmp_download  
+
+  - name: Install terraform
+    tags: terraform
+    ansible.builtin.unarchive:
+      src: https://releases.hashicorp.com/terraform/1.9.3/terraform_1.9.3_linux_amd64.zip
+      dest: /home/osboxes/tmp_download
+      remote_src: yes
+      owner: root
+      group: root
+      mode: 0755
+    register: download_terraform
+    when: create_tmp_download
+  
+  - name: copy terraform
+    tags: terraform
+    ansible.builtin.copy:
+      src: /home/osboxes/tmp_download/terraform
+      dest: /usr/local/bin
+      remote_src: yes
+      owner: root
+      group: root
+      mode: 0755
+    when: download_terraform
+  
+
