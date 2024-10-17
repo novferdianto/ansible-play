@@ -36,4 +36,4 @@ jobs:
             echo "I am $FOO"
             echo "I am $BAR"
             echo "sha: $SHA"
-          run: echo "halo ini dari github-action" > github-action.txt
+            echo "halo ini dari github-action" > github-action.txt
